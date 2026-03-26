@@ -3,11 +3,11 @@ import { cardValues } from "../data/cardValues";
 import { Card } from "../components/Card";
 import { useEffect, useState } from "react";
 
-shuffleCards = () => {
+const shuffleCards = () => {
   return;
 }
 
-createCardData = () => {
+const createCardData = () => {
   return cardValues.map((value, index) => ({
     id: index,
     value,
@@ -21,48 +21,61 @@ function App() {
   const [firstCard, setFirstCard] = useState(null);
   const [isBoardLocked, setIsBoardLocked] = useState(false);
 
-  const initGame = () => {
-    shuffleCards();
-    const finalCards = createCardData();
+  useEffect(() => {
+    const initGame = () => {
+      shuffleCards();
+      const finalCards = createCardData();
 
-    setCards(finalCards);
-  }
+      setCards(finalCards);
+    }
 
-  useEffect(() => initGame(), []);
+    initGame(); 
+  }, []);
 
   const handleCardClick = (clickedCard) => {
     if (clickedCard.isFlipped || isBoardLocked || (clickedCard.id === firstCard?.id)) return;
 
     setCards(currentCards => currentCards.map(card => (card.id === clickedCard.id) ? { ...card, isFlipped: true } : card));
 
-    if (!firstCard) setFirstCard(clickedCard);
+    if (!firstCard) {
+      setFirstCard(clickedCard);
+      return;
+    }
 
-    else { // if its not the first card being clicked, apply matching logic
-      if (firstCard.value === clickedCard.value) {
-        const matchCards = () => {
-          setCards(currentCards =>
-            currentCards.map(card =>
-              (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isMatched: true } : card
-            )
-          )
-        }
-        
-        setTimeout(matchCards, 300);
-      }
+    setIsBoardLocked(true);
 
-      else {
-        const resetCards = () => {
-          setCards(currentCards =>
-            currentCards.map(card =>
-              (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isFlipped: false } : card
-            )
-          )
-        };
-
-        setTimeout(resetCards, 800);
-      }
-
+    const resetStates = () => {
       setFirstCard(null);
+      setIsBoardLocked(false);
+    }
+
+    // if its not the first card clicked, apply matching logic
+    if (firstCard.value === clickedCard.value) {
+      const matchCards = () => {
+        setCards(currentCards =>
+          currentCards.map(card =>
+            (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isMatched: true } : card
+          )
+        );
+
+        resetStates();
+      }
+      
+      setTimeout(matchCards, 300);
+    }
+
+    else {
+      const resetCards = () => {
+        setCards(currentCards =>
+          currentCards.map(card =>
+            (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isFlipped: false } : card
+          )
+        );
+        
+        resetStates();
+      }
+
+      setTimeout(resetCards, 800);
     }
   }
 
