@@ -21,6 +21,9 @@ function App() {
   const [firstCard, setFirstCard] = useState(null);
   const [isBoardLocked, setIsBoardLocked] = useState(false);
 
+  const [score, setScore] = useState(0);
+  const [moves, setMoves] = useState(0);
+
   useEffect(() => {
     const initGame = () => {
       shuffleCards();
@@ -42,6 +45,7 @@ function App() {
       return;
     }
 
+    setMoves(prev => prev + 1);
     setIsBoardLocked(true);
 
     const resetStates = () => {
@@ -81,7 +85,7 @@ function App() {
 
   return (
     <div className="app">
-      <GameHeader score={3} moves={5} />
+      <GameHeader score={3} moves={moves} />
 
       <div className="cards-grid">
         {cards.map(card => <Card card={card} onClick={handleCardClick} />)}
