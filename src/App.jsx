@@ -24,16 +24,22 @@ function App() {
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
 
-  useEffect(() => {
-    const initGame = () => {
-      shuffleCards();
-      const finalCards = createCardData();
-
-      setCards(finalCards);
+  const initGame = (isQueryReset = false) => { 
+    if (isQueryReset) {
+      setFirstCard(null);
+      setIsBoardLocked(false);
+      setScore(0);
+      setMoves(0);
     }
 
-    initGame(); 
-  }, []);
+    shuffleCards();
+
+    const finalCards = createCardData();
+
+    setCards(finalCards);
+  }
+
+  useEffect(() => { initGame() }, []);
 
   const handleCardClick = (clickedCard) => {
     if (clickedCard.isFlipped || isBoardLocked || (clickedCard.id === firstCard?.id)) return;
@@ -61,11 +67,11 @@ function App() {
             (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isMatched: true } : card
           )
         );
-        
+
         setScore(prev => prev + 1);
         resetStates();
       }
-      
+
       setTimeout(matchCards, 300);
     }
 
@@ -76,7 +82,7 @@ function App() {
             (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isFlipped: false } : card
           )
         );
-        
+
         resetStates();
       }
 
@@ -86,7 +92,7 @@ function App() {
 
   return (
     <div className="app">
-      <GameHeader score={score} moves={moves} />
+      <GameHeader score={score} moves={moves} reset={initGame} />
 
       <div className="cards-grid">
         {cards.map(card => <Card card={card} onClick={handleCardClick} />)}
