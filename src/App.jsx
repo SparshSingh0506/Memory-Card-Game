@@ -61,7 +61,8 @@ function App() {
             (card.id === firstCard.id || card.id === clickedCard.id) ? { ...card, isMatched: true } : card
           )
         );
-
+        
+        setScore(prev => prev + 1);
         resetStates();
       }
       
@@ -85,7 +86,7 @@ function App() {
 
   return (
     <div className="app">
-      <GameHeader score={3} moves={moves} />
+      <GameHeader score={score} moves={moves} />
 
       <div className="cards-grid">
         {cards.map(card => <Card card={card} onClick={handleCardClick} />)}
