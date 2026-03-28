@@ -1,6 +1,7 @@
 import { GameHeader } from "../components/GameHeader";
 import { cardValues } from "../data/cardValues";
 import { Card } from "../components/Card";
+import { WinMessage } from "../components/WinMessage";
 import { useEffect, useState, useRef } from "react";
 
 const shuffleCards = () => { //Fisher-Yates array shuffle algo
@@ -110,6 +111,8 @@ function App() {
   return (
     <div className="app">
       <GameHeader score={score} moves={moves} reset={initGame} />
+
+      {score === 8 && <WinMessage moves={moves} />} 
 
       <div className="cards-grid">
         {cards.map(card => <Card card={card} onClick={handleCardClick} />)}
