@@ -1,24 +1,33 @@
 import { GameHeader } from "../components/GameHeader";
 import { cardValues } from "../data/cardValues";
 import { Card } from "../components/Card";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const shuffleCards = () => { //Fisher-Yates array shuffle algo
-  for (let i = cardValues.length - 1; i > 0; i--) {
+  const shuffledCards = [...cardValues];
+
+  for (let i = shuffledCards.length - 1; i > 0; i--) {
     
     let j = Math.floor(Math.random() * (i + 1));
     
-    [cardValues[i], cardValues[j]] = [cardValues[j], cardValues[i]];
+    [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]];
   }
+
+  return shuffledCards;
 }
 
-const createCardData = () => {
-  return cardValues.map((value, index) => ({
+const createCardData = (ShuffledCards) => {
+  return ShuffledCards.map((value, index) => ({
     id: index,
     value,
     isFlipped: false,
     isMatched: false,
   }));
+}
+
+const clearTimeouts = (timeOutIdsRef) => {
+  timeOutIdsRef.current.forEach(clearTimeout);
+  timeOutIdsRef.current = [];
 }
 
 function App() {
@@ -29,18 +38,19 @@ function App() {
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
 
+  const timeOutIdsRef = useRef([]);
+
   const initGame = (isQueryReset = false) => { 
     if (isQueryReset) {
+      clearTimeouts(timeOutIdsRef);
+
       setFirstCard(null);
       setIsBoardLocked(false);
-      setScore(0);
-      setMoves(0);
+      setScore(() => 0);
+      setMoves(() => 0);
     }
 
-    shuffleCards();
-
-    const finalCards = createCardData();
-
+    const finalCards = createCardData(shuffleCards());
     setCards(finalCards);
   }
 
@@ -77,7 +87,8 @@ function App() {
         resetStates();
       }
 
-      setTimeout(matchCards, 300);
+      const timeOutId = setTimeout(matchCards, 300);
+      timeOutIdsRef.current.push(timeOutId);
     }
 
     else {
@@ -91,7 +102,8 @@ function App() {
         resetStates();
       }
 
-      setTimeout(resetCards, 800);
+      const timeOutId = setTimeout(resetCards, 800);
+      timeOutIdsRef.current.push(timeOutId);
     }
   }
 
