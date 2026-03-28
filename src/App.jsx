@@ -3,8 +3,13 @@ import { cardValues } from "../data/cardValues";
 import { Card } from "../components/Card";
 import { useEffect, useState } from "react";
 
-const shuffleCards = () => {
-  return;
+const shuffleCards = () => { //Fisher-Yates array shuffle algo
+  for (let i = cardValues.length - 1; i > 0; i--) {
+    
+    let j = Math.floor(Math.random() * (i + 1));
+    
+    [cardValues[i], cardValues[j]] = [cardValues[j], cardValues[i]];
+  }
 }
 
 const createCardData = () => {
